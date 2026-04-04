@@ -1,15 +1,18 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.db.database import get_db
 from typing import Optional
-from app.schemas.record_schema import RecordCreate
-from app.services.record_service import create_record
-from app.services.record_service import get_records
-from app.services.record_service import get_filtered_records
-from app.services.record_service import get_summary
-from app.services.record_service import update_record
-from app.services.record_service import delete_record
 
+from app.db.database import get_db
+from app.schemas.record_schema import RecordCreate, RecordUpdate
+
+from app.services.record_service import (
+    create_record,
+    get_filtered_records,
+    get_summary,
+    update_record,
+    delete_record,
+    patch_record
+)
 
 router = APIRouter()
 
@@ -17,14 +20,7 @@ router = APIRouter()
 def create_record_api(record: RecordCreate, db: Session = Depends(get_db)):
     return create_record(db, record)
 
-
 @router.get("/records")
-def get_all_records(db: Session = Depends(get_db)):
-    return get_records(db)
-
-
-
-@router.get("/records/filter")
 def get_all_records(
     type: Optional[str] = None,
     category: Optional[str] = None,
@@ -36,7 +32,6 @@ def get_all_records(
 def get_dashboard_summary(db: Session = Depends(get_db)):
     return get_summary(db)
 
-
 @router.put("/records/{record_id}")
 def update_record_api(record_id: int, record: RecordCreate, db: Session = Depends(get_db)):
     return update_record(db, record_id, record)
@@ -44,3 +39,7 @@ def update_record_api(record_id: int, record: RecordCreate, db: Session = Depend
 @router.delete("/records/{record_id}")
 def delete_record_api(record_id: int, db: Session = Depends(get_db)):
     return delete_record(db, record_id)
+
+@router.patch("/records/{record_id}")
+def patch_record_api(record_id: int, record: RecordUpdate, db: Session = Depends(get_db)):
+    return patch_record(db, record_id, record)

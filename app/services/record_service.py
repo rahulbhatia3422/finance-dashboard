@@ -65,3 +65,20 @@ def delete_record(db: Session, record_id: int):
     db.commit()
 
     return {"message": "Record deleted successfully"}
+
+
+def patch_record(db: Session, record_id: int, data):
+    record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
+
+    if not record:
+        return {"error": "Record not found"}
+
+    update_data = data.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(record, key, value)
+
+    db.commit()
+    db.refresh(record)
+
+    return record
