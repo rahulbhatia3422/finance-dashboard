@@ -10,7 +10,7 @@ def create_record(db: Session, record):
     db.refresh(db_record)
     return db_record
 
-def get_filtered_records(db: Session, type=None, category=None, date=None):
+def get_filtered_records(db: Session, skip=0, limit=10, type=None, category=None, date=None):
     query = db.query(models.FinancialRecord)
 
     if type:
@@ -22,7 +22,7 @@ def get_filtered_records(db: Session, type=None, category=None, date=None):
     if date:
         query = query.filter(models.FinancialRecord.date == date)
 
-    return query.all()
+    return query.offset(skip).limit(limit).all()
 
 def get_summary(db: Session):
     total_income = db.query(func.sum(models.FinancialRecord.amount))\

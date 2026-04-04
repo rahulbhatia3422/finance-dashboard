@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import Optional
+from datetime import date
 
 from app.db.database import get_db
 from app.schemas.record_schema import RecordCreate, RecordUpdate
@@ -25,17 +26,17 @@ def create_record_api(
 ):
     return create_record(db, record)
 
-from datetime import date
-
 @router.get("/records")
 def get_all_records(
+    skip: int = 0,
+    limit: int = 10,
     type: Optional[str] = None,
     category: Optional[str] = None,
     date: Optional[date] = None,
     db: Session = Depends(get_db),
     role: str = Depends(check_role(["admin", "analyst", "viewer"]))
 ):
-    return get_filtered_records(db, type, category, date)
+    return get_filtered_records(db, skip, limit, type, category, date)
 
 @router.get("/summary")
 def get_dashboard_summary(
