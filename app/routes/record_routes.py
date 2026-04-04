@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import date
+
 
 from app.db.database import get_db
 from app.schemas.record_schema import RecordCreate, RecordUpdate
@@ -19,7 +20,7 @@ from app.services.record_service import (
 
 router = APIRouter()
 
-@router.post("/records")
+@router.post("/records", status_code=status.HTTP_201_CREATED)
 def create_record_api(
     record: RecordCreate,
     db: Session = Depends(get_db),
@@ -46,7 +47,7 @@ def get_dashboard_summary(
 ):
     return get_summary(db)
 
-@router.put("/records/{record_id}")
+@router.put("/records/{record_id}", status_code=status.HTTP_200_OK)
 def update_record_api(
     record_id: int,
     record: RecordCreate,
@@ -55,15 +56,15 @@ def update_record_api(
 ):
     return update_record(db, record_id, record)
 
-@router.delete("/records/{record_id}")
+@router.delete("/records/{record_id}", status_code=status.Http_204_NO_CONTENT)
 def delete_record_api(
     record_id: int,
     db: Session = Depends(get_db),
     role: str = Depends(check_role(["admin"]))
 ):
-    return delete_record(db, record_id)
+    delete_record(db, record_id)
 
-@router.patch("/records/{record_id}")
+@router.patch("/records/{record_id}", status_code=status.HTTP_200_OK)
 def patch_record_api(
     record_id: int,
     record: RecordUpdate,
