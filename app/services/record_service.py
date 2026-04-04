@@ -53,3 +53,15 @@ def update_record(db: Session, record_id: int, data):
     db.commit()
     db.refresh(record)
     return record
+
+
+def delete_record(db: Session, record_id: int):
+    record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
+
+    if not record:
+        return {"error": "Record not found"}
+
+    db.delete(record)
+    db.commit()
+
+    return {"message": "Record deleted successfully"}
