@@ -39,3 +39,17 @@ def get_summary(db: Session):
         "total_expense": total_expense,
         "net_balance": net_balance
     }
+
+
+def update_record(db: Session, record_id: int, data):
+    record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
+
+    if not record:
+        return {"error": "Record not found"}
+
+    for key, value in data.dict().items():
+        setattr(record, key, value)
+
+    db.commit()
+    db.refresh(record)
+    return record
