@@ -25,14 +25,17 @@ def create_record_api(
 ):
     return create_record(db, record)
 
+from datetime import date
+
 @router.get("/records")
 def get_all_records(
     type: Optional[str] = None,
     category: Optional[str] = None,
+    date: Optional[date] = None,
     db: Session = Depends(get_db),
     role: str = Depends(check_role(["admin", "analyst", "viewer"]))
 ):
-    return get_filtered_records(db, type, category)
+    return get_filtered_records(db, type, category, date)
 
 @router.get("/summary")
 def get_dashboard_summary(

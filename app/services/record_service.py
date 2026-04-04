@@ -10,7 +10,7 @@ def create_record(db: Session, record):
     db.refresh(db_record)
     return db_record
 
-def get_filtered_records(db: Session, type=None, category=None):
+def get_filtered_records(db: Session, type=None, category=None, date=None):
     query = db.query(models.FinancialRecord)
 
     if type:
@@ -18,6 +18,9 @@ def get_filtered_records(db: Session, type=None, category=None):
 
     if category:
         query = query.filter(models.FinancialRecord.category == category)
+
+    if date:
+        query = query.filter(models.FinancialRecord.date == date)
 
     return query.all()
 
@@ -30,10 +33,23 @@ def get_summary(db: Session):
 
     net_balance = total_income - total_expense
 
+    category_data = db.query(
+        models.FinancialRecord.category,
+        func.sum(models.FinancialRecord.amount)
+    ).group_by(models.FinancialRecord.category).all()
+
+    recent = db.query(models.FinancialRecord)\
+        .order_by(models.FinancialRecord.date.desc())\
+        .limit(5).all()
+
     return {
         "total_income": total_income,
         "total_expense": total_expense,
-        "net_balance": net_balance
+        "net_balance": net_balance,
+        "category_summary": [
+            {"category": c, "total": t} for c, t in category_data
+        ],
+        "recent_transactions": recent
     }
 
 def update_record(db: Session, record_id: int, data):
