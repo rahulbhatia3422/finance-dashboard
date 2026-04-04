@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.database import get_db
+from typing import Optional
 from app.schemas.record_schema import RecordCreate
 from app.services.record_service import create_record
 from app.services.record_service import get_records
+from app.services.record_service import get_filtered_records
 
 
 router = APIRouter()
@@ -16,3 +18,13 @@ def create_record_api(record: RecordCreate, db: Session = Depends(get_db)):
 @router.get("/records")
 def get_all_records(db: Session = Depends(get_db)):
     return get_records(db)
+
+
+
+@router.get("/records/filter")
+def get_all_records(
+    type: Optional[str] = None,
+    category: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    return get_filtered_records(db, type, category)
