@@ -2,12 +2,18 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from fastapi import HTTPException
 from app.db import models
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_record(db: Session, record):
     db_record = models.FinancialRecord(**record.dict())
     db.add(db_record)
     db.commit()
     db.refresh(db_record)
+
+    logger.info(f"Created record with ID: {db_record.id}")
     return db_record
 
 def get_filtered_records(db: Session, skip=0, limit=10, type=None, category=None, date=None):
@@ -63,7 +69,10 @@ def update_record(db: Session, record_id: int, data):
 
     db.commit()
     db.refresh(record)
+    logger.info(f"Record updated with ID {record.id}")
     return record
+
+    
 
 def delete_record(db: Session, record_id: int):
     record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
@@ -74,6 +83,7 @@ def delete_record(db: Session, record_id: int):
     record.is_deleted = True
 
     db.commit()
+    logger.info(f"Record soft deleted with ID {record.id}")
 
     return {"message": "Record soft deleted successfully"}
 
@@ -90,7 +100,7 @@ def patch_record(db: Session, record_id: int, data):
 
     db.commit()
     db.refresh(record)
-
+    logger.info(f"Record patched with ID {record.id}")
     return record
 
 
