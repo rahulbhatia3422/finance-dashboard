@@ -7,3 +7,6 @@ def create_record(db: Session, record):
     db.commit()
     db.refresh(db_record)
     return db_record
+
+def get_records(db: Session):
+    return db.query(models.FinancialRecord).all()
