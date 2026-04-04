@@ -91,3 +91,10 @@ def patch_record(db: Session, record_id: int, data):
     db.refresh(record)
 
     return record
+
+
+def search_records(db: Session, keyword: str):
+    return db.query(models.FinancialRecord).filter(
+        (models.FinancialRecord.category.ilike(f"%{keyword}%")) |
+        (models.FinancialRecord.notes.ilike(f"%{keyword}%"))
+    ).all()

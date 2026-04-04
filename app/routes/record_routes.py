@@ -13,7 +13,8 @@ from app.services.record_service import (
     get_summary,
     update_record,
     delete_record,
-    patch_record
+    patch_record,
+    search_records
 )
 
 router = APIRouter()
@@ -70,3 +71,12 @@ def patch_record_api(
     role: str = Depends(check_role(["admin"]))
 ):
     return patch_record(db, record_id, record)
+
+
+@router.get("/records/search")
+def search_records_api(
+    keyword: str,
+    db: Session = Depends(get_db),
+    role: str = Depends(check_role(["admin", "analyst", "viewer"]))
+):
+    return search_records(db, keyword)
