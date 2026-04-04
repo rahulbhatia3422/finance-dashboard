@@ -6,6 +6,7 @@ from app.schemas.record_schema import RecordCreate
 from app.services.record_service import create_record
 from app.services.record_service import get_records
 from app.services.record_service import get_filtered_records
+from app.services.record_service import get_summary
 
 
 router = APIRouter()
@@ -28,3 +29,7 @@ def get_all_records(
     db: Session = Depends(get_db)
 ):
     return get_filtered_records(db, type, category)
+
+@router.get("/summary")
+def get_dashboard_summary(db: Session = Depends(get_db)):
+    return get_summary(db)
