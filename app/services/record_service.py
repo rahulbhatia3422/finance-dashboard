@@ -11,7 +11,7 @@ def create_record(db: Session, record):
     return db_record
 
 def get_filtered_records(db: Session, skip=0, limit=10, type=None, category=None, date=None):
-    query = db.query(models.FinancialRecord)
+    query = db.query(models.FinancialRecord).filter(models.FinancialRecord.is_deleted == False)
 
     if type:
         query = query.filter(models.FinancialRecord.type == type)
@@ -71,10 +71,11 @@ def delete_record(db: Session, record_id: int):
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
 
-    db.delete(record)
+    record.is_deleted = True
+
     db.commit()
 
-    return {"message": "Record deleted successfully"}
+    return {"message": "Record soft deleted successfully"}
 
 def patch_record(db: Session, record_id: int, data):
     record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()

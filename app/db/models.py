@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date
+from sqlalchemy import Column, Integer, String, Float, Date, Boolean
 from .database import Base
 
 class User(Base):
@@ -20,3 +20,4 @@ class FinancialRecord(Base):
     category = Column(String)
     date = Column(Date)
     notes = Column(String)
+    is_deleted = Column(Boolean, default=False)
