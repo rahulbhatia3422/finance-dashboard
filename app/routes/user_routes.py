@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.schemas.user_schema import UserCreate
-from app.services.user_service import create_user, get_users, update_user, delete_user
+from app.schemas.user_schema import UserCreate, UserUpdate
+from app.services.user_service import create_user, get_users, update_user, delete_user, patch_user
 from app.utils.role_checker import check_role
 
 router = APIRouter()
@@ -35,3 +35,12 @@ def delete_user_api(
     role: str = Depends(check_role(["admin"]))
 ):
     return delete_user(db, user_id)
+
+@router.patch("/users/{user_id}")
+def patch_user_api(
+    user_id: int,
+    user: UserUpdate,
+    db: Session = Depends(get_db),
+    role: str = Depends(check_role(["admin"]))
+):
+    return patch_user(db, user_id, user)
