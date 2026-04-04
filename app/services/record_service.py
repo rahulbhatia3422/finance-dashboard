@@ -13,7 +13,7 @@ def create_record(db: Session, record):
     db.commit()
     db.refresh(db_record)
 
-    logger.info(f"Created record with ID: {db_record.id}")
+    logger.info(f"Created record with ID: {db_record.id} and amount: {db_record.amount}")
     return db_record
 
 def get_filtered_records(db: Session, skip=0, limit=10, type=None, category=None, date=None):
@@ -45,8 +45,11 @@ def get_summary(db: Session):
     ).group_by(models.FinancialRecord.category).all()
 
     recent = db.query(models.FinancialRecord)\
+        .filter(models.FinancialRecord.is_deleted == False)\
         .order_by(models.FinancialRecord.date.desc())\
         .limit(5).all()
+
+    logger.info("Fetched dashboard summary")
 
     return {
         "total_income": total_income,
@@ -69,10 +72,9 @@ def update_record(db: Session, record_id: int, data):
 
     db.commit()
     db.refresh(record)
+
     logger.info(f"Record updated with ID {record.id}")
     return record
-
-    
 
 def delete_record(db: Session, record_id: int):
     record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
@@ -81,8 +83,8 @@ def delete_record(db: Session, record_id: int):
         raise HTTPException(status_code=404, detail="Record not found")
 
     record.is_deleted = True
-
     db.commit()
+
     logger.info(f"Record soft deleted with ID {record.id}")
 
     return {"message": "Record soft deleted successfully"}
@@ -100,12 +102,15 @@ def patch_record(db: Session, record_id: int, data):
 
     db.commit()
     db.refresh(record)
+
     logger.info(f"Record patched with ID {record.id}")
     return record
 
-
 def search_records(db: Session, keyword: str):
     return db.query(models.FinancialRecord).filter(
-        (models.FinancialRecord.category.ilike(f"%{keyword}%")) |
-        (models.FinancialRecord.notes.ilike(f"%{keyword}%"))
+        models.FinancialRecord.is_deleted == False,
+        (
+            models.FinancialRecord.category.ilike(f"%{keyword}%") |
+            models.FinancialRecord.notes.ilike(f"%{keyword}%")
+        )
     ).all()
