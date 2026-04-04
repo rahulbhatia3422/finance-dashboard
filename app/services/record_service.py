@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.db import models
 
 def create_record(db: Session, record):
@@ -21,3 +22,20 @@ def get_filtered_records(db: Session, type=None, category=None):
         query = query.filter(models.FinancialRecord.category == category)
 
     return query.all()
+
+
+
+def get_summary(db: Session):
+    total_income = db.query(func.sum(models.FinancialRecord.amount))\
+        .filter(models.FinancialRecord.type == "income").scalar() or 0
+
+    total_expense = db.query(func.sum(models.FinancialRecord.amount))\
+        .filter(models.FinancialRecord.type == "expense").scalar() or 0
+
+    net_balance = total_income - total_expense
+
+    return {
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "net_balance": net_balance
+    }
