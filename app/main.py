@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.db.database import engine, Base
 from app.db import models
+from app.routes import user_routes
 
 app = FastAPI()
 
@@ -10,3 +11,5 @@ Base.metadata.create_all(bind=engine)
 @app.get("/")
 def root():
     return {"message": "Finance Backend Running Successfully!"}
+
+app.include_router(user_routes.router)
