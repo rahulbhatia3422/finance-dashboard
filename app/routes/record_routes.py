@@ -56,7 +56,7 @@ def update_record_api(
 ):
     return update_record(db, record_id, record)
 
-@router.delete("/records/{record_id}", status_code=status.Http_204_NO_CONTENT)
+@router.delete("/records/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_record_api(
     record_id: int,
     db: Session = Depends(get_db),
