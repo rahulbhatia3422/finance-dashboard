@@ -1,8 +1,90 @@
-# 💰 Finance Dashboard Backend (FastAPI)
+# 💰 Finance Dashboard Backend (FastAPI + PostgreSQL)
 
-A production-ready backend system for managing personal financial records, including income, expenses, and analytics. Built using FastAPI with clean architecture, JWT authentication, and role-based access control (RBAC).
+A backend system for managing financial data, built with clean architecture, secure authentication, and scalable API design.
+
+This project demonstrates real-world backend engineering principles aligned with fintech requirements such as data integrity, access control, and performance.
 
 ---
+
+## 🚀 Live Demo & API Docs
+
+🔗 Swagger API Docs  
+[https://finance-dashboard-zytj.onrender.com/docs  ](https://finance-dashboard-zytj.onrender.com/docs)
+
+🔗 GitHub Repository  
+https://github.com/rahulbhatia3422/finance-dashboard.git  
+
+---
+
+## 🎯 Project Objective
+
+This project was built as part of a backend assessment focused on:
+
+- API design & architecture  
+- Data modeling & persistence  
+- Role-based access control  
+- Financial data processing  
+- Clean and maintainable code  
+
+It fulfills all core requirements including:
+
+- User & role management  
+- Financial records CRUD  
+- Dashboard analytics  
+- Access control (RBAC)  
+- Validation & error handling  
+
+---
+
+## 🧠 Why FastAPI + PostgreSQL?
+
+### ⚡ FastAPI
+
+- High performance (similar to Node.js & Go)
+- Built-in validation using Pydantic
+- Automatic Swagger documentation
+- Async support for handling multiple requests
+- Ideal for real-time fintech systems
+
+👉 FastAPI is well-suited for fintech applications requiring speed, scalability, and security.
+
+---
+
+### 🐘 PostgreSQL
+
+- ACID compliance → ensures financial data integrity  
+- Strong relational data modeling  
+- Advanced querying for analytics  
+- Widely used in banking & fintech systems  
+
+---
+
+### 🌐 Deployment (Render)
+
+- Backend deployed on Render  
+- PostgreSQL database hosted on Render  
+- Public API available for testing  
+- Simple CI/CD integration  
+
+---
+
+## 🔐 Authentication & Authorization
+
+### JWT-Based Authentication
+
+- Secure token-based login  
+- Stateless authentication  
+- Scalable for production systems  
+
+---
+
+### 🔑 Login Flow
+
+1. User sends request to `/login`  
+2. Server validates credentials  
+3. JWT token is generated  
+4. Token is used to access protected APIs  
+
 
 ## 🚀 Features
 
@@ -67,7 +149,6 @@ finance-dashboard/
 │   ├── routes/
 │   │   ├── user_routes.py
 │   │   ├── record_routes.py
-│   │   ├── auth_routes.py
 │── main.py
 ```
 
@@ -80,6 +161,7 @@ finance-dashboard/
 * SQLAlchemy ORM
 * JWT (python-jose)
 * Uvicorn
+* Render (Deployment)
 
 ---
 
@@ -88,7 +170,7 @@ finance-dashboard/
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/your-username/finance-dashboard.git
+git clone https://github.com/rahulbhatia3422/finance-dashboard.git
 cd finance-dashboard
 ```
 
@@ -105,10 +187,10 @@ source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Run Server
+### 4️⃣ Run APIs Locally 
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ---
@@ -117,13 +199,20 @@ uvicorn main:app --reload
 
 ### Login
 
-```
-POST /login
+POST `/login`
+
+Example:
 ```
 
-Response:
+Email: rahul_admin@gmail.com  
+Role: admin  
 
 ```
+
+
+### Response
+
+```json
 {
   "access_token": "...",
   "token_type": "bearer"
@@ -137,6 +226,67 @@ Click **Authorize** in Swagger UI and enter:
 ```
 Bearer <your_token>
 ```
+
+
+👉 Or create your own user using `/users`
+
+---
+
+## 🛡️ Role-Based Access Control (RBAC)
+
+| Role     | Permissions |
+|----------|------------|
+| Admin    | Full access (CRUD + user management) |
+| Analyst  | Read + analytics |
+| Viewer   | Read-only |
+
+✔ Implemented using dependency-based role validation  
+✔ Ensures secure backend operations  
+
+---
+
+## 🗄️ Data Models Overview
+
+### 👤 User
+
+- id  
+- name  
+- email  
+- role (admin / analyst / viewer)
+- is_active
+
+---
+
+### 💸 Record
+
+- id  
+- amount  
+- type (income / expense)  
+- category  
+- notes  
+- is_deleted
+
+---
+
+## ⚖️ Assumptions & Trade-offs
+
+- Soft delete used instead of hard delete to preserve financial history  
+- JWT authentication implemented without refresh tokens for simplicity  
+- Role system kept minimal (admin, analyst, viewer)  
+- No rate limiting added to keep implementation focused  
+- Focused on backend logic over frontend/UI  
+
+---
+
+## 🧭 API Flow (High Level)
+
+Client  
+   ↓  
+FastAPI Routes  
+   ↓  
+Services Layer  
+   ↓  
+Database (PostgreSQL)
 
 ---
 
@@ -188,6 +338,13 @@ Bearer <your_token>
 ```
 /records/search?keyword=salary
 ```
+
+## 🧪 Testing Strategy
+
+- Manual testing performed using Swagger UI  
+- All CRUD operations verified  
+- Role-based access control tested  
+- Error handling tested for invalid inputs and unauthorized access  
 
 ---
 
