@@ -204,12 +204,11 @@ POST `/login`
 Example:
 ```
 
-| Role    | Email                                         | Name          | Permissions                               |
-| ------- | --------------------------------------------- | ------------- | ----------------------------------------- |
-| Admin   | rahul@admin.com | Rahul Admin   | Full system access                        |
-| Analyst | bablu@analyst.com | Bablu Analyst | Create/Update own records, View analytics |
-| Viewer  | raj@viewer.com | Raj Viewer    | Read-only access                          |
- 
+| Role    | Email               | Name           | Permissions                                      |
+|---------|---------------------|----------------|--------------------------------------------------|
+| Admin   | rahul@admin.com     | Rahul Admin    | Full system access                               |
+| Analyst | bablu@analyst.com   | Bablu Analyst  | Create/Update own records, View analytics        |
+| Viewer  | raj@viewer.com      | Raj Viewer     | Read-only access                                 |
 
 ```
 
