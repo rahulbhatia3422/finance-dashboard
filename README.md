@@ -201,6 +201,24 @@ uvicorn app.main:app --reload
 
 POST `/login`
 
+```
+{
+  "name": "string",
+  "email": "string",
+  "role": "string"
+}
+
+```
+
+```
+{
+  "name": "Rahul Admin",
+  "email": "rahul@admin.com",
+  "role": "admin"
+}
+
+```
+
 Example:
 ```
 
