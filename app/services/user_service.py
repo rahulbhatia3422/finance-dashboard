@@ -3,6 +3,10 @@ from fastapi import HTTPException
 from app.db import models
 
 def create_user(db: Session, user):
+    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+    
     db_user = models.User(**user.dict())
     db.add(db_user)
     db.commit()
@@ -11,6 +15,12 @@ def create_user(db: Session, user):
 
 def get_users(db: Session):
     return db.query(models.User).all()
+
+def get_user_by_id(db: Session, user_id: int):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 def update_user(db: Session, user_id: int, data):
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -51,3 +61,12 @@ def patch_user(db: Session, user_id: int, data):
     db.refresh(user)
 
     return user
+
+def update_user_status(db: Session, user_id: int, status: str):
+    if status not in ["active", "inactive"]:
+        raise HTTPException(status_code=400, detail="Status must be 'active' or 'inactive'")
+    
+    user = get_user_by_id(db, user_id)
+    user.is_active = status
+    db.commit()
+    return {"message": f"User {user.name} is now {status}", "user_id": user_id, "status": status}

@@ -1,14 +1,11 @@
 from fastapi import FastAPI
-from app.db.database import engine, Base
-from app.db import models
-from app.routes import user_routes
-from app.routes import record_routes
+from app.routes import user_routes, record_routes
 
-app = FastAPI()
+app = FastAPI(title="Finance Dashboard API", version="1.0.0")
 
-# Tables create
-Base.metadata.create_all(bind=engine)
+app.include_router(user_routes.router, prefix="/api", tags=["Users"])
+app.include_router(record_routes.router, prefix="/api", tags=["Records"])
 
-
-app.include_router(user_routes.router)
-app.include_router(record_routes.router)
+@app.get("/")
+def root():
+    return {"message": "Finance Dashboard API is running"}

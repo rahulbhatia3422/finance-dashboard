@@ -23,3 +23,15 @@ def verify_token(credentials=Depends(security)):
         return payload
     except JWTError:
         raise HTTPException(status_code=403, detail="Invalid token")
+
+def get_current_user_id(payload=Depends(verify_token)):
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="User ID not found in token")
+    return user_id
+
+def get_current_user_role(payload=Depends(verify_token)):
+    role = payload.get("role")
+    if not role:
+        raise HTTPException(status_code=401, detail="Role not found in token")
+    return role
