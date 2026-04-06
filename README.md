@@ -204,8 +204,12 @@ POST `/login`
 Example:
 ```
 
-Email: rahul_admin@gmail.com  
-Role: admin  
+| Role    | Email                                         | Name          | Permissions                               |
+| ------- | --------------------------------------------- | ------------- | ----------------------------------------- |
+| Admin   | [rahul@admin.com](mailto:rahul@admin.com)     | Rahul Admin   | Full system access                        |
+| Analyst | [bablu@analyst.com](mailto:bablu@analyst.com) | Bablu Analyst | Create/Update own records, View analytics |
+| Viewer  | [raj@viewer.com](mailto:raj@viewer.com)       | Raj Viewer    | Read-only access                          |
+ 
 
 ```
 
@@ -265,6 +269,7 @@ Bearer <your_token>
 - category  
 - notes  
 - is_deleted
+- user_id
 
 ---
 
