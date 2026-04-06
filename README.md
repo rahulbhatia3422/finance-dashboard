@@ -294,32 +294,51 @@ Database (PostgreSQL)
 
 ---
 
-## 📌 API Endpoints
-
-### 👤 Users
-
-* POST `/users` → Create user
-* GET `/users` → Get all users (admin only)
-* PUT `/users/{id}` → Update user
-* PATCH `/users/{id}` → Partial update
-* DELETE `/users/{id}` → Delete user
+## 📡 API Endpoints
 
 ---
 
-### 💸 Records
+### 🔐 Authentication
 
-* POST `/records` → Create record
-* GET `/records` → Get records (filter + pagination)
-* GET `/records/search` → Search records
-* PUT `/records/{id}` → Update record
-* PATCH `/records/{id}` → Partial update
-* DELETE `/records/{id}` → Soft delete
+| Method | Endpoint      | Description             |
+|--------|--------------|--------------------------|
+| POST   | `/api/login` | Login and get JWT token  |
+| POST   | `/api/users` | Create new user          |
 
 ---
 
-### 📊 Dashboard
+### 👤 User Management (Admin Only)
 
-* GET `/summary` → Financial summary
+| Method | Endpoint                      | Description               |
+|--------|-------------------------------|---------------------------|
+| GET    | `/api/users`                  | Get all users             |
+| GET    | `/api/users/{id}`             | Get user by ID            |
+| PUT    | `/api/users/{id}`             | Update user               |
+| PATCH  | `/api/users/{id}`             | Partial update            |
+| PATCH  | `/api/users/{id}/status`      | Activate/deactivate user  |
+| DELETE | `/api/users/{id}`             | Delete user               |
+
+---
+
+### 📊 Records Management
+
+| Method | Endpoint                | Description                 |
+|--------|------------------------|------------------------------|
+| POST   | `/api/records`         | Create record                |
+| GET    | `/api/records`         | Get records (filterable)     |
+| GET    | `/api/records/search`  | Search records               |
+| PUT    | `/api/records/{id}`    | Update record                |
+| PATCH  | `/api/records/{id}`    | Partial update               |
+| DELETE | `/api/records/{id}`    | Soft delete                  |
+
+---
+
+### 📈 Analytics
+
+| Method | Endpoint               | Description         |
+|--------|------------------------|---------------------|
+| GET    | `/api/summary`         | Dashboard summary   |
+| GET    | `/api/trends/monthly`  | Monthly trends      |
 
 ---
 
