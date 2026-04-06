@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, extract
+from sqlalchemy import func, extract, case
 from fastapi import HTTPException
 from app.db import models
 import logging
@@ -90,14 +90,18 @@ def get_monthly_trends(db: Session, user_id: int = None):
         query = db.query(
             extract('year', models.FinancialRecord.date).label('year'),
             extract('month', models.FinancialRecord.date).label('month'),
-            func.sum(func.case(
-                (models.FinancialRecord.type == 'income', models.FinancialRecord.amount),
-                else_=0
-            )).label('total_income'),
-            func.sum(func.case(
-                (models.FinancialRecord.type == 'expense', models.FinancialRecord.amount),
-                else_=0
-            )).label('total_expense')
+            func.sum(
+                case(
+                    (models.FinancialRecord.type == 'income', models.FinancialRecord.amount),
+                    else_=0
+                )
+            ).label('total_income'),
+            func.sum(
+                case(
+                    (models.FinancialRecord.type == 'expense', models.FinancialRecord.amount),
+                    else_=0
+                )
+            ).label('total_expense')
         ).filter(models.FinancialRecord.is_deleted == False)
         
         if user_id:
@@ -111,9 +115,9 @@ def get_monthly_trends(db: Session, user_id: int = None):
                 "year": int(year),
                 "month": int(month),
                 "month_name": get_month_name(int(month)),
-                "income": float(income),
-                "expense": float(expense),
-                "balance": float(income - expense)
+                "income": float(income or 0),
+                "expense": float(expense or 0),
+                "balance": float((income or 0) - (expense or 0))
             })
         
         logger.info(f"Monthly trends returned {len(trends)} months for user_id: {user_id}")
