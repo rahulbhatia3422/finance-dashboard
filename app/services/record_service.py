@@ -80,42 +80,48 @@ def get_summary(db: Session, user_id: int = None):
         "recent_transactions": recent
     }
 
-def get_monthly_trends(db: Session, user_id: int = None):
-    query = db.query(
-        extract('year', models.FinancialRecord.date).label('year'),
-        extract('month', models.FinancialRecord.date).label('month'),
-        func.sum(func.case(
-            (models.FinancialRecord.type == 'income', models.FinancialRecord.amount),
-            else_=0
-        )).label('total_income'),
-        func.sum(func.case(
-            (models.FinancialRecord.type == 'expense', models.FinancialRecord.amount),
-            else_=0
-        )).label('total_expense')
-    ).filter(models.FinancialRecord.is_deleted == False)
-    
-    if user_id:
-        query = query.filter(models.FinancialRecord.user_id == user_id)
-    
-    results = query.group_by('year', 'month').order_by('year', 'month').all()
-    
-    trends = []
-    for year, month, income, expense in results:
-        trends.append({
-            "year": int(year),
-            "month": int(month),
-            "month_name": get_month_name(int(month)),
-            "income": float(income),
-            "expense": float(expense),
-            "balance": float(income - expense)
-        })
-    
-    return trends
-
 def get_month_name(month):
     months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return months[month - 1]
+
+def get_monthly_trends(db: Session, user_id: int = None):
+    try:
+        query = db.query(
+            extract('year', models.FinancialRecord.date).label('year'),
+            extract('month', models.FinancialRecord.date).label('month'),
+            func.sum(func.case(
+                (models.FinancialRecord.type == 'income', models.FinancialRecord.amount),
+                else_=0
+            )).label('total_income'),
+            func.sum(func.case(
+                (models.FinancialRecord.type == 'expense', models.FinancialRecord.amount),
+                else_=0
+            )).label('total_expense')
+        ).filter(models.FinancialRecord.is_deleted == False)
+        
+        if user_id:
+            query = query.filter(models.FinancialRecord.user_id == user_id)
+        
+        results = query.group_by('year', 'month').order_by('year', 'month').all()
+        
+        trends = []
+        for year, month, income, expense in results:
+            trends.append({
+                "year": int(year),
+                "month": int(month),
+                "month_name": get_month_name(int(month)),
+                "income": float(income),
+                "expense": float(expense),
+                "balance": float(income - expense)
+            })
+        
+        logger.info(f"Monthly trends returned {len(trends)} months for user_id: {user_id}")
+        return trends
+        
+    except Exception as e:
+        logger.error(f"Error in get_monthly_trends: {str(e)}")
+        return []
 
 def update_record(db: Session, record_id: int, data, current_user_id: int, current_user_role: str):
     record = db.query(models.FinancialRecord).filter(models.FinancialRecord.id == record_id).first()
@@ -126,7 +132,10 @@ def update_record(db: Session, record_id: int, data, current_user_id: int, curre
     if current_user_role != "admin" and record.user_id != current_user_id:
         raise HTTPException(status_code=403, detail="Access denied: You can only update your own records")
 
-    for key, value in data.dict().items():
+    update_data = data.dict(exclude_unset=True)
+    update_data.pop('user_id', None)
+
+    for key, value in update_data.items():
         setattr(record, key, value)
 
     db.commit()
@@ -141,8 +150,8 @@ def delete_record(db: Session, record_id: int, current_user_id: int, current_use
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
     
-    if current_user_role != "admin" and record.user_id != current_user_id:
-        raise HTTPException(status_code=403, detail="Access denied: You can only delete your own records")
+    if current_user_role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied: Only admin can delete records")
 
     record.is_deleted = True
     db.commit()
@@ -161,6 +170,7 @@ def patch_record(db: Session, record_id: int, data, current_user_id: int, curren
         raise HTTPException(status_code=403, detail="Access denied: You can only modify your own records")
 
     update_data = data.dict(exclude_unset=True)
+    update_data.pop('user_id', None)
 
     for key, value in update_data.items():
         setattr(record, key, value)
